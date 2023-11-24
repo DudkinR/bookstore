@@ -1,0 +1,23 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Publisher extends Model
+{
+    use HasFactory;
+    // table
+    protected $table = 'publishers';
+    // fillable
+    protected $fillable = [
+        'name',
+          ];
+    // relationships
+    public function books()
+    {
+        return $this->belongsToMany(Book::class, 'book_publisher');
+    }
+    
+}
