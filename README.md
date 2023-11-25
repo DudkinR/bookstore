@@ -20,11 +20,18 @@ Node.js and NPM (for Vite)
 Clone this repository.
 
 Run composer install to install PHP dependencies.
+: composer install
+
+
 Run npm install to install Node.js dependencies.
+
+: npm install
 
 ## Configuration
 Copy the .env.example file to .env and configure your environment settings.
-Run php artisan key:generate to generate an application key.
+Run artisan to generate an application key.
+
+: php artisan key:generate 
 
 # Usage
 ## Development
@@ -41,11 +48,17 @@ Feel free to contribute to this project. Follow the contribution guidelines for 
 ## DB
 Main worksheet of the 'books' Where only the name of the book is stored there are also auxiliary tables - these are the 'authors' and 'publishers' who are connected to the main table by a many-to-many relationship.
 
-php artisan migrate
+: php artisan migrate
 
 You can generate test data by running the command:
 
-php artisan db:seed --class=BooksTableSeeder
+: php artisan db:seed --class=BooksTableSeeder
+
+## start server
+
+: php artisan serve
+
+
 
 ## CRUD
 System for recording, editing, reading and deleting, (CRUD) organized using standard laravel functions. 
