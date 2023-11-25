@@ -36,12 +36,9 @@
         </div>
     </div>
     <script>
-        
-     window.csrfToken = '{{ csrf_token() }}';
      window.books = {!!$books!!}; // Replace with your actual data
-    // console.log( window.books );
-     window.pages=chunkArray(window.books, 5);
-    let page=1;
+     window.pages=chunkArray(window.books, 5); // 5 items per page
+    let page=1; // start only with page 1
     showPageContent(page, window.pages);
     showPagination(page, window.pages);
     </script>

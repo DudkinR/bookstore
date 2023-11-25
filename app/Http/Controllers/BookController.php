@@ -51,8 +51,8 @@ class BookController extends Controller
      * Display the specified resource.
      */
     public function show(string $id)
-    {
-        $book= Book::find($id);
+    { // dont use this becouse have realisation in index to js 
+        $book= Book::find($id);  
         return view('books.show', compact('book'));
     }
     /**
@@ -68,32 +68,37 @@ class BookController extends Controller
 
     /**
      * Update the specified resource in storage.
-     */public function update(Request $request, string $id)
-{
-    $request->validate([
-        'title' => 'required',
-        'author_id' => 'required_without:new_author|array',
-        'author_id.*' => 'distinct|exists:authors,id',
-        'publisher_id' => 'required_without:new_publisher|array',
-        'publisher_id.*' => 'distinct|exists:publishers,id',
-    ]);
-    $book = Book::find($id);
-    $book->title = $request->title;
-    $book->save();
-    $authorIds = $request->input('author_id', []);
-    if ($request->new_author) {
-        $newAuthor = $this->new_author($request->new_author);
-        $authorIds[] = $newAuthor->id;
+     * 
+     */
+     public function update(Request $request, string $id)
+    {
+        $request->validate([
+            'title' => 'required',
+            'author_id' => 'required_without:new_author|array',
+            'author_id.*' => 'distinct|exists:authors,id',
+            'publisher_id' => 'required_without:new_publisher|array',
+            'publisher_id.*' => 'distinct|exists:publishers,id',
+        ]);
+        $book = Book::find($id);
+        $book->title = $request->title;
+        $book->save();
+        $authorIds = $request->input('author_id', []);
+        if ($request->new_author) {
+            $newAuthor = $this->new_author($request->new_author);
+            $authorIds[] = $newAuthor->id;
+        }
+        $book->authors()->sync($authorIds);
+        $publisherIds = $request->input('publisher_id', []);
+        if ($request->new_publisher) {
+            $newPublisher = $this->new_publisher($request->new_publisher);
+            $publisherIds[] = $newPublisher->id;
+        }
+        $book->publishers()->sync($publisherIds);
+        return redirect()->route('books.index'); 
     }
-    $book->authors()->sync($authorIds);
-    $publisherIds = $request->input('publisher_id', []);
-    if ($request->new_publisher) {
-        $newPublisher = $this->new_publisher($request->new_publisher);
-        $publisherIds[] = $newPublisher->id;
-    }
-    $book->publishers()->sync($publisherIds);
-    return redirect()->route('books.index'); 
-}
+    /**
+     * Remove the specified resource from storage.
+     */
 
     public function destroy(string $id)
     {
@@ -107,7 +112,10 @@ class BookController extends Controller
             // book not found
             return response()->json(['error' => 'Book not found'], 404);
         }
+        // we do not return to the index, because we are using AJAX
     }
+
+    // have or not author 
     public function new_author($name)
     {
         $author = Author::where('name', $name)->first();
@@ -122,6 +130,8 @@ class BookController extends Controller
             return $author;
         }
     }
+
+    // have or not publisher
     public function new_publisher($name)
     {
         $publisher = Publisher::where('name', $name)->first();
@@ -136,6 +146,8 @@ class BookController extends Controller
             return $publisher;
         }
     }
+
+    // have or not book
     public function present_book($title, $author, $publisher)
     {
         $book = Book::where('title', $title)->first();
@@ -152,9 +164,7 @@ class BookController extends Controller
             return $book;
         }
     }
-    /**
-     * Remove the specified resource from storage.
-     */
+     // API all books 
     public function indexAPI()
     {
         $books = Book::all()->load('authors', 'publishers');

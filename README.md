@@ -29,8 +29,6 @@ Configuration
 Copy the .env.example file to .env and configure your environment settings.
 Run php artisan key:generate to generate an application key.
 
-
-
 Usage
 Development
 Run the following commands for development:
@@ -43,10 +41,27 @@ Run the following commands for production:
 Contributing
 Feel free to contribute to this project. Follow the contribution guidelines for more details.
 
-License
-This project is licensed under the MIT License - see the LICENSE file for details.
-    
-Remember to replace placeholders like `CONTRIBUTING.md` and `LICENSE` with the actual filenames and customize the content based on your project structure and specific requirements.
+Main worksheet of the 'books' Where only the name of the book is stored there are also auxiliary tables - these are the 'authors' and 'publishers' who are connected to the main table by a many-to-many relationship.
+
+php artisan migrate
+
+You can generate test data by running the command:
+
+php artisan db:seed --class=BooksTableSeeder
+
+System for recording, editing, reading and deleting, (CRUD) organized using standard laravel functions. 
+Recording editing and deleting books is only possible for authorized users.
+
+However, according to the task, a books page was organized that works according to a javascript scheme, receives an array of data of all books, organizes pagination through its own functions, sorts and displays books by author and publicist.
+
+Control functions for JavaScript pagination sorting and displaying data located in the file:
+
+public\js\components\pagination.js
+
+
+
+
+
 
 
 

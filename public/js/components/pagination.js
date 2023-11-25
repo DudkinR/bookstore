@@ -13,7 +13,7 @@ function chunkArray(array, chunkSize=5) {
     updateBooks(data[page - 1]);
     showPagination(page, data);
    }
-
+// show books
 function updateBooks(data) {
     const container = document.getElementById('_books');
     container.innerHTML = '';
@@ -52,16 +52,16 @@ function updateBooks(data) {
   }  
   container.appendChild(row);
 }
-
+// sort books by params
 function sort(type) {
   const books = window.books;
-  if (type === 'az') {
+  if (type === 'az') { // sort by title a->z
     books.sort((a, b) => a.title.localeCompare(b.title));
   }
-  else if (type === 'za') {
+  else if (type === 'za') { // sort by title z->a
     books.sort((a, b) => b.title.localeCompare(a.title));
   }
-  else if (type === 'tm') {
+  else if (type === 'tm') { // sort by created_at time
     books.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
   }
   window.books = books;
@@ -70,7 +70,7 @@ function sort(type) {
   showPagination(1, window.pages);
 }
 
-function showOneBook(id){
+function showOneBook(id){ // show one book
   // use window.books
   const book = window.books.find(book => book.id === id);
   const container = document.getElementById('_books');
@@ -92,30 +92,28 @@ function showOneBook(id){
   col.appendChild(back);
   row2.appendChild(col);
   pagination.appendChild(row2);
-// check if user is logged in
-if (window.user) {
-  const col2 = document.createElement('div');
-  col2.className = 'col';  
-
-  // add button 'Edit'
-  const editLink = document.createElement('a');
-  editLink.href = `/books/${book.id}/edit`;
-  editLink.className = 'btn btn-primary';
-  editLink.textContent = 'Edit';
-  col2.appendChild(editLink);
-
-  // Создаем кнопку для удаления
-  const deleteBtn = document.createElement('button');
-  deleteBtn.type = 'button';
-  deleteBtn.className = 'btn btn-danger';
-  deleteBtn.textContent = 'Delete';
-  deleteBtn.addEventListener('click', () => deleteBook(id));
-
-  col2.appendChild(deleteBtn);
-  row2.appendChild(col2);
+  // check if user is logged in
+  if (window.user) {
+    const col2 = document.createElement('div');
+    col2.className = 'col';  
+    // add button 'Edit'
+    const editLink = document.createElement('a');
+    editLink.href = `/books/${book.id}/edit`;
+    editLink.className = 'btn btn-primary';
+    editLink.textContent = 'Edit';
+    col2.appendChild(editLink);
+    // create form delete
+    const deleteBtn = document.createElement('button');
+    deleteBtn.type = 'button';
+    deleteBtn.className = 'btn btn-danger';
+    deleteBtn.textContent = 'Delete';
+    deleteBtn.addEventListener('click', () => deleteBook(id));
+    col2.appendChild(deleteBtn);
+    row2.appendChild(col2);
+  }
 }
 
-}
+// show all books on page load
 function createRow(book, showButton = true) {
   const row = document.createElement('div');
   row.className = 'row';
@@ -149,6 +147,7 @@ function createRow(book, showButton = true) {
 
   return row;
 }
+
 // show books only author
 function showBooksByAuthor(id) {
   const booksByAuthor = window.books.filter(book => book.authors.some(author => author.id === id));
@@ -157,7 +156,6 @@ function showBooksByAuthor(id) {
   showPagination(1, window.pages);
 }
 
-
 // show books only publisher
 function showBooksByPublisher(id) {
   const books = window.books.filter(book => book.publishers.some(publisher => publisher.id === id));
@@ -165,6 +163,8 @@ function showBooksByPublisher(id) {
   showPageContent(1, window.pages);
   showPagination(1, window.pages);
 }
+
+// delete book
 function deleteBook(id) {
   fetch(`/books/${id}`, {
     method: 'DELETE',
@@ -189,6 +189,8 @@ function deleteBook(id) {
   });
 }
 
+
+// create list of authors 
 function createAuthorsList(authors) {
   const ul = document.createElement('ul');
   authors.forEach(author => {
@@ -203,6 +205,8 @@ function createAuthorsList(authors) {
   return ul;
 }
 
+
+// create list of publishers
 function createPublishersList(publishers) {
   const ul = document.createElement('ul');
   publishers.forEach(publisher => {

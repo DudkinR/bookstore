@@ -13,9 +13,9 @@ class BooksTableSeeder extends Seeder
     public function run(): void
     {
         //
-        \App\Models\Book::factory()->count(10)->create();
+        \App\Models\Book::factory()->count(100)->create();
         // author 
-        \App\Models\Author::factory()->count(10)->create();
+        \App\Models\Author::factory()->count(50)->create();
         // publisher
         \App\Models\Publisher::factory()->count(10)->create();
         // add attach
@@ -24,10 +24,10 @@ class BooksTableSeeder extends Seeder
         $publishers = \App\Models\Publisher::all();
         foreach ($books as $book) {
             $book->authors()->attach(
-                $authors->random(rand(1, 3))->pluck('id')->toArray()
+                $authors->random(rand(1, 1))->pluck('id')->toArray()
             );
             $book->publishers()->attach(
-                $publishers->random(rand(1, 3))->pluck('id')->toArray()
+                $publishers->random(rand(1, 2))->pluck('id')->toArray()
             );
         }
 
