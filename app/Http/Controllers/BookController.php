@@ -97,10 +97,16 @@ class BookController extends Controller
 
     public function destroy(string $id)
     {
-        //
+            // find book by id
         $book = Book::find($id);
-        $book->delete();
-        return redirect()->route('books.index');
+        if ($book) {
+            $book->delete();
+            // additional code after delete success
+            return response()->json(['success' => true]);
+        } else {
+            // book not found
+            return response()->json(['error' => 'Book not found'], 404);
+        }
     }
     public function new_author($name)
     {

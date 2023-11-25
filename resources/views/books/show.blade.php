@@ -33,6 +33,7 @@
                 </ul>
             </div>
         </div>
+        @if(Auth::check())
         <div class="row">
             <h1>Maneger</h1>
             <div class="col">
@@ -45,8 +46,7 @@
                     <button type="submit" class="btn btn-danger">Delete</button>
                 </form>
             </div>
-
         </div>
-
+        @endif
     </div>
 @endsection

@@ -9,44 +9,10 @@ function chunkArray(array, chunkSize=5) {
   }
   // show page content
   function showPageContent(page, data) {
+    window.page = page;
     updateBooks(data[page - 1]);
     showPagination(page, data);
    }
- 
-   function createRow(book) {
-    const row = document.createElement('div');
-    row.className = 'row';
-    const col = document.createElement('div');
-    col.className = 'col';
-    const h2 = document.createElement('h2');
-    h2.textContent = book.title;
-    const showLink = document.createElement('a');
-    showLink.href = `/books/${book.id}`;
-    showLink.className = 'btn btn-success';
-    showLink.textContent = 'Show';
-
-    // check if user is logged in
-    if (window.user) {
-        const editLink = document.createElement('a');
-        editLink.href = `/books/${book.id}/edit`;
-        editLink.className = 'btn btn-primary';
-        editLink.textContent = 'Edit';
-        col.appendChild(editLink);
-    }
-
-    const authorP = document.createElement('p');
-    authorP.textContent = `Author: ${book.authors.map(author => author.name).join(', ')}`;
-    const publisherP = document.createElement('p');
-    publisherP.textContent = `Publisher: ${book.publishers.map(publisher => publisher.name).join(', ')}`;
-
-    col.appendChild(h2);
-    col.appendChild(showLink);
-    col.appendChild(authorP);
-    col.appendChild(publisherP);
-    row.appendChild(col);
-
-    return row;
-}
 
 function updateBooks(data) {
     const container = document.getElementById('_books');
@@ -102,4 +68,124 @@ function sort(type) {
   window.pages=chunkArray(window.books, 5);
   showPageContent(1, window.pages);
   showPagination(1, window.pages);
+}
+
+function showOneBook(id){
+  // use window.books
+  const book = window.books.find(book => book.id === id);
+  const container = document.getElementById('_books');
+  container.innerHTML = '';
+  const row = createRow(book, false);
+  container.appendChild(row);
+  // in section _pagination, show only one button 'Back' AND form delete with token if user is logged in
+  const pagination = document.getElementById('_pagination');
+  pagination.innerHTML = '';
+  const row2 = document.createElement('div');
+  row2.className = 'row';
+  const col = document.createElement('div');
+  col.className = 'col';  
+  const back = document.createElement('a');
+  back.href = '#';
+  back.textContent = 'Back';
+  back.className = 'btn btn-primary text-white';
+  back.addEventListener('click', () => showPageContent(window.page, window.pages));
+  col.appendChild(back);
+  row2.appendChild(col);
+  pagination.appendChild(row2);
+// check if user is logged in
+if (window.user) {
+  const col2 = document.createElement('div');
+  col2.className = 'col';  
+
+  // add button 'Edit'
+  const editLink = document.createElement('a');
+  editLink.href = `/books/${book.id}/edit`;
+  editLink.className = 'btn btn-primary';
+  editLink.textContent = 'Edit';
+  col2.appendChild(editLink);
+
+  // Создаем кнопку для удаления
+  const deleteBtn = document.createElement('button');
+  deleteBtn.type = 'button';
+  deleteBtn.className = 'btn btn-danger';
+  deleteBtn.textContent = 'Delete';
+  deleteBtn.addEventListener('click', () => deleteBook(id));
+
+  col2.appendChild(deleteBtn);
+  row2.appendChild(col2);
+}
+
+}
+function createRow(book, showButton = true) {
+  const row = document.createElement('div');
+  row.className = 'row';
+  const col = document.createElement('div');
+  col.className = 'col';
+  const h2 = document.createElement('h2');
+  h2.textContent = book.title;
+  // check if showButton is true
+  if (showButton) {
+    const showLink = document.createElement('a');
+    showLink.href = '#';
+    showLink.addEventListener('click', () => showOneBook(book.id));
+    showLink.className = 'btn btn-success';
+    showLink.textContent = 'Show';
+    col.appendChild(showLink);
+     // check if user is logged in
+    if (window.user) {
+        const editLink = document.createElement('a');
+        editLink.href = `/books/${book.id}/edit`;
+        editLink.className = 'btn btn-primary';
+        editLink.textContent = 'Edit';
+        col.appendChild(editLink);
+    }
+  }
+  const authorP = document.createElement('p');
+  authorP.textContent = `Author: ${book.authors.map(author => author.name).join(', ')}`;
+  const publisherP = document.createElement('p');
+  publisherP.textContent = `Publisher: ${book.publishers.map(publisher => publisher.name).join(', ')}`;
+  col.appendChild(h2);
+  col.appendChild(authorP);
+  col.appendChild(publisherP);
+  row.appendChild(col);
+
+  return row;
+}
+// show books only author
+function showBooksByAuthor(id) {
+  const books = window.books.filter(book => book.authors.find(author => author.id === id));
+  window.pages=chunkArray(books, 5);
+  showPageContent(1, window.pages);
+  showPagination(1, window.pages);
+}
+
+// show books only publisher
+function showBooksByPublisher(id) {
+  const books = window.books.filter(book => book.publishers.find(publisher => publisher.id === id));
+  window.pages=chunkArray(books, 5);
+  showPageContent(1, window.pages);
+  showPagination(1, window.pages);
+}
+function deleteBook(id) {
+  fetch(`/books/${id}`, {
+    method: 'DELETE',
+    headers: {
+        'X-CSRF-TOKEN': window.csrfToken,
+        'Content-Type': 'application/json',
+    },
+  })
+  .then(response => {
+      if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      return response.json();
+  })
+  .then(data => {
+      //  success message
+      console.log(data);
+      window.location.reload();
+  })
+  .catch(error => {
+      console.error('Error:', error);
+  });
 }

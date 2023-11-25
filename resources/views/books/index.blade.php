@@ -6,11 +6,13 @@
                 <h1>List of books</h1>
             </div>
         </div>
+        @if(Auth::check())
         <div class="row">
             <div class="col">
                 <a href="{{ route('books.create') }}" class="btn btn-primary">New book</a>
             </div>
         </div>
+        @endif
         <div class="row">
             <div class="col">
                 <h1>Sort</h1>
@@ -34,9 +36,10 @@
         </div>
     </div>
     <script>
+        
      window.csrfToken = '{{ csrf_token() }}';
      window.books = {!!$books!!}; // Replace with your actual data
-     console.log( window.books );
+    // console.log( window.books );
      window.pages=chunkArray(window.books, 5);
     let page=1;
     showPageContent(page, window.pages);
