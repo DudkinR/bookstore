@@ -17,8 +17,15 @@
         'resources/sass/app.scss', 
         'resources/js/app.js',
     ])
-
     <script src="{{ asset('js/components/pagination.js') }}" ></script>
+    <script>
+    // authorisation     
+        @if(Auth::check())
+            window.user = {!! json_encode(Auth::user()) !!};
+        @else
+            window.user = null;
+        @endif
+    </script>
 </head>
 <body> 
     <div id="app">
