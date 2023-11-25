@@ -140,10 +140,8 @@ function createRow(book, showButton = true) {
         col.appendChild(editLink);
     }
   }
-  const authorP = document.createElement('p');
-  authorP.textContent = `Author: ${book.authors.map(author => author.name).join(', ')}`;
-  const publisherP = document.createElement('p');
-  publisherP.textContent = `Publisher: ${book.publishers.map(publisher => publisher.name).join(', ')}`;
+  const authorP = createAuthorsList(book.authors);
+  const publisherP = createPublishersList(book.publishers);
   col.appendChild(h2);
   col.appendChild(authorP);
   col.appendChild(publisherP);
@@ -153,15 +151,16 @@ function createRow(book, showButton = true) {
 }
 // show books only author
 function showBooksByAuthor(id) {
-  const books = window.books.filter(book => book.authors.find(author => author.id === id));
-  window.pages=chunkArray(books, 5);
+  const booksByAuthor = window.books.filter(book => book.authors.some(author => author.id === id));
+  window.pages = chunkArray(booksByAuthor, 5);
   showPageContent(1, window.pages);
   showPagination(1, window.pages);
 }
 
+
 // show books only publisher
 function showBooksByPublisher(id) {
-  const books = window.books.filter(book => book.publishers.find(publisher => publisher.id === id));
+  const books = window.books.filter(book => book.publishers.some(publisher => publisher.id === id));
   window.pages=chunkArray(books, 5);
   showPageContent(1, window.pages);
   showPagination(1, window.pages);
@@ -188,4 +187,32 @@ function deleteBook(id) {
   .catch(error => {
       console.error('Error:', error);
   });
+}
+
+function createAuthorsList(authors) {
+  const ul = document.createElement('ul');
+  authors.forEach(author => {
+      const li = document.createElement('li');
+      const link = document.createElement('a');
+      link.href = '#'; 
+      link.textContent = author.name;
+      link.addEventListener('click', () => showBooksByAuthor(author.id));
+      li.appendChild(link);
+      ul.appendChild(li);
+  });
+  return ul;
+}
+
+function createPublishersList(publishers) {
+  const ul = document.createElement('ul');
+  publishers.forEach(publisher => {
+      const li = document.createElement('li');
+      const link = document.createElement('a');
+      link.href = '#'; 
+      link.textContent = publisher.name;
+      link.addEventListener('click', () => showBooksByPublisher(publisher.id));
+      li.appendChild(link);
+      ul.appendChild(li);
+  });
+  return ul;
 }
