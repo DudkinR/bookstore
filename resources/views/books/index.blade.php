@@ -21,7 +21,7 @@
                 <input class="form-control" type="text" placeholder="Search" aria-label="Search" id="search">
             </div>
             <div class="col">
-                <a href="#" class="btn btn-info" onclick="searchBooks('{{route('books.searchAPI')}}')" >Search</a>
+                <a href="#" class="btn btn-info" onclick="BookController.searchBooks('{{route('books.searchAPI')}}')" >Search</a>
             </div>
         </div>
         <hr>
@@ -50,9 +50,9 @@
     </div>
     <script>
      window.books = {!!$books!!}; // Replace with your actual data
-     window.pages=chunkArray(window.books, 5); // 5 items per page
+     window.pages=BookController.chunkArray(window.books, 5); // 5 items per page
     let page=1; // start only with page 1
-    showPageContent(page, window.pages);
-    showPagination(page, window.pages);
+    BookController.showPageContent(page, window.pages);
+    BookController.showPagination(page, window.pages);
     </script>
 @endsection

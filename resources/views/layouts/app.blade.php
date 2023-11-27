@@ -25,6 +25,7 @@
         @else
             window.user = null;
         @endif
+        window.csrfToken = "{{ csrf_token() }}";
     </script>
 </head>
 <body> 
