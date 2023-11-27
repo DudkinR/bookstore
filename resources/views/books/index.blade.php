@@ -6,13 +6,25 @@
                 <h1>List of books</h1>
             </div>
         </div>
+        <hr>
         @if(Auth::check())
         <div class="row">
             <div class="col">
                 <a href="{{ route('books.create') }}" class="btn btn-primary">New book</a>
             </div>
         </div>
+        <hr>
         @endif
+        <!-- Search form -->
+        <div class="row">
+            <div class="col">
+                <input class="form-control" type="text" placeholder="Search" aria-label="Search" id="search">
+            </div>
+            <div class="col">
+                <a href="#" class="btn btn-info" onclick="searchBooks('{{route('books.searchAPI')}}')" >Search</a>
+            </div>
+        </div>
+        <hr>
         <div class="row">
             <div class="col">
                 <h1>Sort</h1>
@@ -28,6 +40,7 @@
             </div>
             
         </div>
+        <hr>
         <div class="container" id="_books">
 
         </div>

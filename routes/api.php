@@ -18,5 +18,7 @@ use App\Http\Controllers\BookController;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
-
+// all books
 Route::get('/books', [BookController::class, 'indexAPI'])->name('books.indexAPI');
+// searchAPI
+Route::any('/books/search', [BookController::class, 'searchAPI'])->name('books.searchAPI');

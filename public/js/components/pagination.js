@@ -220,3 +220,37 @@ function createPublishersList(publishers) {
   });
   return ul;
 }
+// ajax request to get books (search)
+function searchBooks(api_url) {
+  const search = document.getElementById('search').value;
+  //console.log(search);
+  // form post data
+  const formData = new FormData();
+  formData.append('search', search);
+  // ajax request
+  fetch(api_url, {
+    method: 'POST',
+    headers: {
+      'X-CSRF-TOKEN': window.csrfToken,
+    },
+    body: formData,
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+    return response.json(); // change to JSON
+  })
+  .then(data => {
+    //console.log(data);
+    if (data.length > 0) {
+    window.books = data;
+    window.pages = chunkArray(window.books, 5);
+    showPageContent(1, window.pages);
+    showPagination(1, window.pages);
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+  });
+}

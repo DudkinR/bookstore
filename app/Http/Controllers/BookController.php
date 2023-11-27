@@ -170,5 +170,17 @@ class BookController extends Controller
         $books = Book::all()->load('authors', 'publishers');
         return response()->json($books);
     }
+    // API search book by title
+    public function searchAPI(Request $request)
+    {
+        $search = $request->input('search');
+        if(!$search){
+            return response()->json([]);
+        }
+        //loadAuthorsAndPublishers
+       $books = Book::where('title', 'like', "%$search%")->get()->load('authors', 'publishers');
+       return response()->json($books);
+    }
+
 
 }
