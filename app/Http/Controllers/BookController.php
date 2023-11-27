@@ -6,13 +6,23 @@ use App\Models\Author;
 use App\Models\Publisher;
 class BookController extends Controller
 {
+
+    private $book;
+    private $author;
+    private $publisher;
+
+    public function __construct(Book $book, Author $author, Publisher $publisher)
+    {
+        $this->book = $book;
+        $this->author = $author;
+        $this->publisher = $publisher;
+    }
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $book= new Book;
-        $books = json_encode($book->loadAuthorsAndPublishers());
+        $books = json_encode($this->book->loadAuthorsAndPublishers());
         return view('books.index', compact('books'));
     }
     /**
@@ -52,7 +62,7 @@ class BookController extends Controller
      */
     public function show(string $id)
     { // dont use this becouse have realisation in index to js 
-        $book= Book::find($id);  
+        $book=$this->book->loadAuthorsAndPublishers()->find($id);
         return view('books.show', compact('book'));
     }
     /**
@@ -60,9 +70,9 @@ class BookController extends Controller
      */
     public function edit(string $id)
     {
-        $book = Book::find($id)->load('authors', 'publishers');
-        $authors = Author::all();
-        $publishers = Publisher::all();
+        $book = $this->book->find($id) ->load('authors', 'publishers');
+        $authors = $this->author->all();
+        $publishers = $this->publisher->all();
         return view('books.edit', compact('book', 'authors', 'publishers'));
     }
 
@@ -79,7 +89,7 @@ class BookController extends Controller
             'publisher_id' => 'required_without:new_publisher|array',
             'publisher_id.*' => 'distinct|exists:publishers,id',
         ]);
-        $book = Book::find($id);
+        $book = $this->book->find($id);
         $book->title = $request->title;
         $book->save();
         $authorIds = $request->input('author_id', []);
@@ -103,7 +113,7 @@ class BookController extends Controller
     public function destroy(string $id)
     {
             // find book by id
-        $book = Book::find($id);
+        $book = $this->book->find($id);
         if ($book) {
             $book->delete();
             // additional code after delete success
@@ -118,13 +128,13 @@ class BookController extends Controller
     // have or not author 
     public function new_author($name)
     {
-        $author = Author::where('name', $name)->first();
+        $author = $this->author->where('name', $name)->first();
         if($author){
             return $author;
         }
         else
         {
-            $author = new Author();
+            $author = $this->author;
             $author->name = $name;
             $author->save();
             return $author;
@@ -134,13 +144,13 @@ class BookController extends Controller
     // have or not publisher
     public function new_publisher($name)
     {
-        $publisher = Publisher::where('name', $name)->first();
+        $publisher = $this->publisher->where('name', $name)->first();
         if($publisher){
             return $publisher;
         }
         else
         {
-            $publisher = new Publisher();
+            $publisher = $this->publisher;
             $publisher->name = $name;
             $publisher->save();
             return $publisher;
@@ -150,13 +160,13 @@ class BookController extends Controller
     // have or not book
     public function present_book($title, $author, $publisher)
     {
-        $book = Book::where('title', $title)->first();
+        $book =  $this->book->where('title', $title)->first();
         if($book){
             return $book;
         }
         else
         {
-            $book = new Book();
+            $book = $this->book;
             $book->title = $title;
             $book->save();
             $book->authors()->attach($author);
@@ -167,7 +177,7 @@ class BookController extends Controller
      // API all books 
     public function indexAPI()
     {
-        $books = Book::all()->load('authors', 'publishers');
+        $books = $this->book->loadAuthorsAndPublishers();
         return response()->json($books);
     }
     // API search book by title
@@ -178,7 +188,7 @@ class BookController extends Controller
             return response()->json([]);
         }
         //loadAuthorsAndPublishers
-       $books = Book::where('title', 'like', "%$search%")->get()->load('authors', 'publishers');
+       $books =  $this->book->where('title', 'like', "%$search%")->get()->load('authors', 'publishers');
        return response()->json($books);
     }
 
