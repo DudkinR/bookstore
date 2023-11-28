@@ -4,18 +4,35 @@ use Illuminate\Http\Request;
 use App\Models\Book;
 use App\Models\Author;
 use App\Models\Publisher;
+use App\Services\AuthorService;
+use App\Services\PublisherService;
+use App\Services\BookService;
+
 class BookController extends Controller
 {
 
     private $book;
     private $author;
     private $publisher;
-
-    public function __construct(Book $book, Author $author, Publisher $publisher)
+    protected $authorService;
+    protected $publisherService;
+    protected $bookService;
+    public function __construct(
+        Book $book,
+        Author $author,
+        Publisher $publisher,
+        AuthorService $authorService,
+        PublisherService $publisherService,
+        BookService $bookService
+        )
     {
         $this->book = $book;
         $this->author = $author;
         $this->publisher = $publisher;
+        $this->authorService = $authorService;
+        $this->publisherService = $publisherService;
+        $this->bookService = $bookService;
+
     }
     /**
      * Display a listing of the resource.
@@ -47,14 +64,15 @@ class BookController extends Controller
             'publisher_id.*' => 'distinct|exists:publishers,id',
         ]);
         if($request->new_author)
-            $author_id = $this->new_author($request->new_author)->id;
+            $author_id = $this->authorService->getOrCreateAuthor($request->new_author)->id;
         else
             $author_id = $request->author_id;
         if($request->new_publisher)
-            $publisher_id = $this->new_publisher($request->new_publisher)->id;
+            $publisher_id = $this-> publisherService->getOrCreatePublisher($request->new_publisher)->id;
         else
             $publisher_id = $request->publisher_id;
-        $this->present_book($request->title, $author_id, $publisher_id);
+        $this-> bookService->getOrCreateBook($request->title, $author_id, $publisher_id);
+        
         return redirect()->route('books.index');
     }
     /**
@@ -94,13 +112,13 @@ class BookController extends Controller
         $book->save();
         $authorIds = $request->input('author_id', []);
         if ($request->new_author) {
-            $newAuthor = $this->new_author($request->new_author);
+            $newAuthor = $this-> authorService->getOrCreateAuthor($request->new_author);
             $authorIds[] = $newAuthor->id;
         }
         $book->authors()->sync($authorIds);
         $publisherIds = $request->input('publisher_id', []);
         if ($request->new_publisher) {
-            $newPublisher = $this->new_publisher($request->new_publisher);
+            $newPublisher = $this->publisherService->getOrCreatePublisher($request->new_publisher);
             $publisherIds[] = $newPublisher->id;
         }
         $book->publishers()->sync($publisherIds);
@@ -125,55 +143,6 @@ class BookController extends Controller
         // we do not return to the index, because we are using AJAX
     }
 
-    // have or not author 
-    public function new_author($name)
-    {
-        $author = $this->author->where('name', $name)->first();
-        if($author){
-            return $author;
-        }
-        else
-        {
-            $author = $this->author;
-            $author->name = $name;
-            $author->save();
-            return $author;
-        }
-    }
-
-    // have or not publisher
-    public function new_publisher($name)
-    {
-        $publisher = $this->publisher->where('name', $name)->first();
-        if($publisher){
-            return $publisher;
-        }
-        else
-        {
-            $publisher = $this->publisher;
-            $publisher->name = $name;
-            $publisher->save();
-            return $publisher;
-        }
-    }
-
-    // have or not book
-    public function present_book($title, $author, $publisher)
-    {
-        $book =  $this->book->where('title', $title)->first();
-        if($book){
-            return $book;
-        }
-        else
-        {
-            $book = $this->book;
-            $book->title = $title;
-            $book->save();
-            $book->authors()->attach($author);
-            $book->publishers()->attach($publisher);
-            return $book;
-        }
-    }
      // API all books 
     public function indexAPI()
     {
